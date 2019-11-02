@@ -1,6 +1,5 @@
 package ru.netology.webSelenide;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.Keys;
@@ -28,15 +27,10 @@ public class webSelenide {
     @Test
     @DisplayName("Все поля заполнены верно")
     void shouldTestPositive() {
-        Calendar c = new GregorianCalendar();
-        c.add(Calendar.DAY_OF_YEAR, 3);
-        SimpleDateFormat format = new SimpleDateFormat("dd.MM.yyyy");
-        String dateOfMeeting = format.format(c.getTime());
-
         open(serviceUrl);
         $(cityInputCss).setValue("Новосибирск");
         $(dateInputCss).sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
-        $(dateInputCss).setValue(dateOfMeeting);
+        $(dateInputCss).setValue(getNextDate("3","dd.MM.yyyy"));
         $(nameInputCss).setValue("Пупкин Василий");
         $(phoneInputCss).setValue("+79200000000");
         $(checkBoxCss).click();
@@ -49,23 +43,26 @@ public class webSelenide {
         open(serviceUrl);
         $(cityInputCss).setValue("Но");
         $(menuCss).waitUntil(visible, 5000);
-        Thread.sleep(2000);
         $$(menuCss).last().find(withText("Новосибирск")).click();
-        Thread.sleep(2000);
+
     }
     @Test
     @DisplayName("Выбор даты на неделю вперёд (начиная от текущей даты) через инструмент календаря")
     void shouldTestSelectionDateViaCalendar() throws InterruptedException {
-        Calendar c1 = new GregorianCalendar();
-        c1.add(Calendar.DAY_OF_YEAR, 7);
-        SimpleDateFormat format1 = new SimpleDateFormat("d");
-        String dateOfMeeting1 = format1.format(c1.getTime());
-
         open(serviceUrl);
         $(dateInputCss).sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
         $(calendarCss).waitUntil(visible, 5000);
-        Thread.sleep(3000);
-        $$(calendarDayCss).find(exactText(dateOfMeeting1)).click();
-        Thread.sleep(3000);
+        $$(calendarDayCss).find(exactText(getNextDate("7","d"))).click();
+
+    }
+    public static String getNextDate(String plusDays, String formatDate){
+        int plusDaysInt = Integer.parseInt(plusDays);
+
+        Calendar c = new GregorianCalendar();
+        c.add(Calendar.DAY_OF_YEAR, plusDaysInt);
+        SimpleDateFormat format = new SimpleDateFormat(formatDate);
+        String dateOfMeeting = format.format(c.getTime());
+
+        return dateOfMeeting;
     }
 }
